@@ -1,0 +1,11 @@
+[Unit]
+Description=Watch Caddy cert and stage it for PortSIP
+After=caddy.service
+
+[Service]
+ExecStart=/usr/local/bin/watch-caddy-cert.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

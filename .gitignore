@@ -1,0 +1,11 @@
+dist/
+# Bí mật: không bao giờ commit
+telegram.conf
+sbc.cred
+*.cred
+*.key
+*.pem
+.env
+profiles/**/telegram.conf
+profiles/**/sbc.cred
+!*.example

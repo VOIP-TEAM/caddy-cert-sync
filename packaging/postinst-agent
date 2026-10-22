@@ -1,0 +1,24 @@
+#!/bin/sh
+set -e
+R="${DPKG_ROOT:-}"
+CONF="$R/etc/pbx-cert-agent.conf"
+EX="$R/usr/local/share/caddy-cert-sync/examples/pbx-cert-agent.conf.example"
+case "$1" in
+    configure)
+        mkdir -p "$R/etc"
+        if [ ! -f "$CONF" ]; then
+            install -m 640 "$EX" "$CONF"
+            echo "Đã tạo /etc/pbx-cert-agent.conf: kiểm tra PBX_CRT, PBX_KEY, PBX_RESTART_CONTAINERS cho khớp VM PBX này"
+        else
+            echo "Giữ nguyên /etc/pbx-cert-agent.conf đã có"
+        fi
+        cat <<'MSG'
+Đã cài agent. Bước tiếp trên VM PBX:
+  1. Thêm khoá công khai của VM SBC vào ~/.ssh/authorized_keys của tài khoản dùng để thay cert, MỘT dòng:
+       restrict,command="/usr/local/bin/pbx-agent.sh",from="IP-VM-SBC" ssh-ed25519 AAAA... cert-sync
+  2. Nếu dùng root: PermitRootLogin forced-commands-only trong /etc/ssh/sshd_config, rồi reload sshd.
+  3. Từ VM SBC kiểm tra: ssh -i <khoá> user@IP-PBX ping   (phải in: pbx-agent ok)
+MSG
+        ;;
+esac
+exit 0

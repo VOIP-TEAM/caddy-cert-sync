@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+case "$1" in
+    remove)
+        if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+            systemctl stop caddy-cert-sync.service caddy-cert-apply.timer caddy-cert-stuck-check.timer caddy-cert-sync-watchdog.timer caddy-cert-expiry-check.timer 2>/dev/null || true
+        fi
+        ;;
+esac
+exit 0

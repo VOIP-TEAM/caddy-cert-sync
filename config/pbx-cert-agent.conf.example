@@ -1,0 +1,6 @@
+# /etc/pbx-cert-agent.conf — đặt TRÊN VM PBX (cài bằng: sudo ./install.sh --agent)
+PBX_CRT="/var/lib/portsip/pbx/certificates/portsip.crt"
+PBX_KEY="/var/lib/portsip/pbx/certificates/portsip.key"
+PORTSIP_UID=888
+PORTSIP_GID=888
+PBX_RESTART_CONTAINERS="portsip.webserver"

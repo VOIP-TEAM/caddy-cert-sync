@@ -1,0 +1,16 @@
+# Ví dụ chạy trên một server. Đường dẫn trong container GIỮ NGUYÊN như trên máy chủ,
+# nên cùng một config.conf dùng được cho cả hai cách chạy.
+services:
+  cert-sync:
+    image: ghcr.io/<tổ-chức>/<repo>:v1.1.0
+    container_name: cert-sync
+    restart: unless-stopped
+    network_mode: host                  # bắt buộc: script đo cert qua 127.0.0.1 và gọi API SBC ở 127.0.0.1:8883
+    environment:
+      TZ: Asia/Ho_Chi_Minh              # PHẢI trùng múi giờ máy chủ, vì khung giờ 22:00-05:00 tính theo giờ trong container
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock                     # để docker restart portsip.webserver (xem cảnh báo bảo mật trong README)
+      - /etc/caddy-cert-sync:/etc/caddy-cert-sync                     # config.conf, telegram.conf, sbc.cred
+      - /var/lib/caddy-cert-sync:/var/lib/caddy-cert-sync             # trạng thái (đặt LOG cũng vào đây để giữ nhật ký)
+      - /var/lib/caddy/.local/share/caddy:/var/lib/caddy/.local/share/caddy:ro   # nguồn cert (Caddy hoặc lego)
+      - /var/lib/portsip/pbx/certificates:/var/lib/portsip/pbx/certificates      # nơi ghi cert cho PBX

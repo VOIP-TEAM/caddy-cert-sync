@@ -1,0 +1,12 @@
+Package: caddy-cert-sync
+Version: @VERSION@
+Section: admin
+Priority: optional
+Architecture: all
+Depends: bash, openssl, curl, jq, inotify-tools, coreutils
+Conflicts: caddy-cert-sync-agent
+Maintainer: eTelecom <root@localhost>
+Description: Tự động thay certificate cho PortSIP PBX và SBC
+ Canh cert do Caddy (hoặc lego) cấp, chuẩn bị và chỉ thay vào PortSIP trong khung
+ giờ bảo trì, thông báo qua Telegram. Cấu hình riêng của từng server nằm ở
+ /etc/caddy-cert-sync và không bao giờ bị gói ghi đè.

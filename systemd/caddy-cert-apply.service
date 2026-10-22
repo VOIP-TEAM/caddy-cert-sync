@@ -1,0 +1,6 @@
+[Unit]
+Description=Apply staged cert to PortSIP (PBX restart + SBC API)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/cert-deploy.sh apply

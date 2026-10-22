@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+R="${DPKG_ROOT:-}"
+CFG="$R/etc/caddy-cert-sync"
+EX="$R/usr/local/share/caddy-cert-sync/examples"
+case "$1" in
+    configure)
+        install -d -m 755 "$CFG"
+        [ -f "$CFG/config.conf" ]   || install -m 644 "$EX/config.conf.example"   "$CFG/config.conf"
+        [ -f "$CFG/telegram.conf" ] || install -m 600 "$EX/telegram.conf.example" "$CFG/telegram.conf"
+        [ -f "$CFG/sbc.cred" ]      || install -m 600 "$EX/sbc.cred.example"      "$CFG/sbc.cred"
+        if [ -z "$R" ] && [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+            systemctl daemon-reload || true
+            systemctl try-restart caddy-cert-sync.service || true
+        fi
+        echo "caddy-cert-sync $(cat "$R/usr/local/share/caddy-cert-sync/VERSION"): chọn hồ sơ (cp /usr/local/share/caddy-cert-sync/profiles/<same-vm|diff-vm>/config.conf $CFG/config.conf, chỉ khi chưa chỉnh), sửa config.conf, điền telegram.conf và sbc.cred, rồi bật dịch vụ."
+        ;;
+esac
+exit 0

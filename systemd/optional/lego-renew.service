@@ -1,0 +1,8 @@
+[Unit]
+Description=Renew the certificate with lego, only when <= 15 days are left
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/lego run --path /var/lib/lego --server letsencrypt --email you@example.com --accept-tos --domains sip-dev-v22.etelecom.vn --http --http.address :80 --renew-days 15 --ari-disable

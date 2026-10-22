@@ -1,0 +1,13 @@
+Package: caddy-cert-sync-agent
+Version: @VERSION@
+Section: admin
+Priority: optional
+Architecture: all
+Depends: bash, openssl, coreutils, util-linux
+Recommends: openssh-server
+Conflicts: caddy-cert-sync
+Maintainer: eTelecom <root@localhost>
+Description: Agent thay certificate cho PortSIP PBX (cài trên VM PBX khi khác VM)
+ Chỉ gồm pbx-agent.sh: nhận cert từ hệ thống thay cert chạy ở VM khác qua SSH
+ (khoá bị ràng buộc bằng command=), ghi nguyên tử, sao lưu, restart container
+ PBX và hoàn tác khi lỗi. Không dùng chung một VM với gói caddy-cert-sync.

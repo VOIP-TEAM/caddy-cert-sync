@@ -1,0 +1,6 @@
+[Unit]
+Description=Warn when the certificate in use is close to expiry
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/cert-deploy.sh expiry

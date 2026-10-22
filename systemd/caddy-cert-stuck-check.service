@@ -1,0 +1,6 @@
+[Unit]
+Description=Alert if a staged cert has not been applied for too long
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/cert-deploy.sh stuck

@@ -1,0 +1,28 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tag phải khớp VERSION
+        run: test "v$(cat VERSION)" = "${GITHUB_REF_NAME}"
+      - name: Tag phải nằm trên nhánh main (đã qua Pull Request và CI)
+        run: git merge-base --is-ancestor "${GITHUB_SHA}" origin/main
+      - name: Cài công cụ
+        run: sudo apt-get update && sudo apt-get install -y jq inotify-tools shellcheck
+      - name: Kiểm tra và kiểm thử
+        run: make lint test
+      - name: Đóng gói tất cả sản phẩm và tạo SHA256SUMS
+        run: make release
+      - name: Phát hành
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" dist/*.tar.gz dist/*.deb dist/SHA256SUMS --generate-notes

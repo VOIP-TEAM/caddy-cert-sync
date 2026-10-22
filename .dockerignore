@@ -1,0 +1,9 @@
+.git
+.github
+dist
+profiles
+tests
+patches
+packaging
+systemd
+*.md

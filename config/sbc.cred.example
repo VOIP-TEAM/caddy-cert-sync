@@ -1,0 +1,3 @@
+# Quyền 600. Điền giá trị thật trên server, KHÔNG commit.
+SBC_USER="admin"
+SBC_PASS="ĐIỀN"

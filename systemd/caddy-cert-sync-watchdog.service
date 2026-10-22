@@ -1,0 +1,6 @@
+[Unit]
+Description=Alert if caddy-cert-sync is down
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/check-sync-alive.sh

@@ -1,0 +1,21 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cài công cụ
+        run: sudo apt-get update && sudo apt-get install -y jq inotify-tools shellcheck
+      - name: Kiểm tra cú pháp và shellcheck mức lỗi
+        run: make lint
+      - name: Chạy bộ kiểm thử
+        run: make test
+      - name: Thử đóng gói (gói đầy đủ, gói agent, tarball, checksum)
+        run: make release
+      - name: Thử dựng image
+        run: make image

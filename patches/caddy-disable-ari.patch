@@ -1,0 +1,22 @@
+--- a/modules/caddytls/automation.go
++++ b/modules/caddytls/automation.go
+@@ -128,6 +128,11 @@
+ 	// you may wish to increase the ratio to ~1/2.
+ 	RenewalWindowRatio float64 `json:"renewal_window_ratio,omitempty"`
+ 
++	// If true, renewal timing ignores ACME Renewal Information (ARI) from
++	// the CA and is decided only by renewal_window_ratio (plus the built-in
++	// emergency windows near expiration). Local patch, not in upstream Caddy.
++	DisableARI bool `json:"disable_ari,omitempty"`
++
+ 	// The type of key to generate for certificates.
+ 	// Supported values: `ed25519`, `p256`, `p384`, `rsa2048`, `rsa4096`.
+ 	KeyType string `json:"key_type,omitempty"`
+@@ -364,6 +369,7 @@
+ 	cfg := certmagic.Config{
+ 		MustStaple:         ap.MustStaple,
+ 		RenewalWindowRatio: ap.RenewalWindowRatio,
++		DisableARI:         ap.DisableARI,
+ 		KeySource:          keySource,
+ 		OnEvent:            tlsApp.onEvent,
+ 		ShouldEmitFunc:     tlsApp.events.ShouldEmit,
