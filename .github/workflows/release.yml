@@ -12,6 +12,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Script phải có quyền thực thi trong Git (mode 100755)
+        run: |
+          bad=0
+          for f in $(git ls-files 'bin/*.sh' | grep -v '/lib-') install.sh container/entrypoint.sh; do
+            mode=$(git ls-files --stage -- "$f" | cut -d' ' -f1)
+            if [ "$mode" != "100755" ]; then echo "THIẾU quyền thực thi: $f (mode ${mode:-không có trong Git})"; bad=1; fi
+          done
+          if [ "$bad" = 1 ]; then
+            echo "Sửa trên máy phát triển: git update-index --chmod=+x <tệp>, rồi commit và push."
+            echo "(Git trên Windows ghi mọi tệp với quyền 644 nếu không chạy lệnh trên.)"
+            exit 1
+          fi
       - name: Tag phải khớp VERSION
         run: test "v$(cat VERSION)" = "${GITHUB_REF_NAME}"
       - name: Tag phải nằm trên nhánh main (đã qua Pull Request và CI)

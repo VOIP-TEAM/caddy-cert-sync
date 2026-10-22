@@ -8,6 +8,9 @@ Tách phương án build theo trường hợp triển khai:
 - Gói đầy đủ kèm hồ sơ same-vm và diff-vm trong /usr/local/share/caddy-cert-sync/profiles/ (không kèm hồ sơ riêng của từng server). Hai gói khai báo Conflicts với nhau để không cài chung một VM.
 - tests/test-packaging.sh kiểm tra nội dung và metadata của từng sản phẩm.
 - release.yml từ chối tag không nằm trên nhánh main.
+- tests/run-tests.sh thoát mã 1 khi có điểm lỗi (trước đó luôn thoát 0 nên CI không đỏ khi bộ kiểm thử chính lỗi; chỉ các bộ khác làm CI đỏ).
+- ci.yml và release.yml kiểm tra ngay từ đầu rằng script có quyền thực thi trong Git (mode 100755), vì Git trên Windows ghi quyền 644.
+- Thêm .gitattributes ép xuống dòng LF cho mọi tệp văn bản.
 - tests/test-container.sh bớt chập chờn (chờ lâu hơn giữa các mốc giờ giả). Các bộ kiểm thử đã được chạy bằng người dùng thường, như runner của GitHub.
 
 ## 1.4.0

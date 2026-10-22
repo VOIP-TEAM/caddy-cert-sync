@@ -477,3 +477,4 @@ $T/stubs/srv.sh stop pbx; $T/stubs/srv.sh stop sbc
 
 echo; echo "KẾT QUẢ: $ok đạt, $bad lỗi"
 $T/stubs/srv.sh stop pbx; $T/stubs/srv.sh stop sbc
+[ "$bad" -eq 0 ]
