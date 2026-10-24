@@ -1,6 +1,7 @@
 # Lịch sử thay đổi
 
 ## 1.5.1
+- release.yml: bước "Tag phải khớp VERSION" giờ tự loại CRLF và BOM khi đọc VERSION trước khi so sánh (trước đó một tệp VERSION bị lưu lại bằng trình soạn thảo Windows có thể làm bước này thất bại dù nội dung nhìn giống hệt tag).
 - health-check.sh: thêm kiểm tra khi PBX_SSH đã đặt (PBX ở VM khác) nhưng PBX_PORTS không có IP (chỉ có số cổng) — trường hợp hay gặp khi tự chỉnh hồ sơ same-vm cho khác VM thay vì dùng hồ sơ diff-vm. Báo LỖI kèm gợi ý đúng IP lấy từ PBX_SSH.
 - config/config.conf.example và profiles/same-vm/config.conf: thêm ghi chú TODO ngay cạnh PBX_SSH, nhắc phải sửa PBX_PORTS kèm IP nếu bật PBX_SSH.
 

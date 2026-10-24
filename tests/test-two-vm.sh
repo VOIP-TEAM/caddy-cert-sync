@@ -104,16 +104,21 @@ check "SBC_DOCKER_CMD=none: bỏ qua kiểm tra tiến trình SBC, không gọi 
 check "đo SBC bằng SNI của SBC (sbc.test), không phải domain PBX" 'grep -q -- "-connect 127.0.0.2:18999 -servername sbc.test" "$T/ssl.log"'
 
 echo "== I health-check: PBX_SSH đặt nhưng PBX_PORTS thiếu IP (lỗi hay gặp khi tự chỉnh hồ sơ same-vm cho khác VM)"
-printf 'DOMAIN="pbx.test"\nSBC_TLS_DOMAIN="sbc.test"\nCADDY_CERT_BASE="%s/none"\nSTATE_DIR="%s/hc/state"\nLOG="%s/hc/log"\nPBX_PORTS="8887"\nSBC_PORTS="127.0.0.2:18999"\nSBC_DOCKER_CMD=none\nPBX_SSH="root@10.106.222.50"\nPBX_SSH_KEY="%s/none-key"\n' "$T" "$T" "$T" "$T" > "$T/hc/config.conf"
-out=$(PATH="$T/stubs:$PATH" CFG_DIR="$T/hc" SYSTEMD_RUN_DIR="$T/khong" bash "$ROOT/bin/health-check.sh" 2>&1)
+# Thư mục và cổng RIÊNG, không dùng chung với bài test H phía trên: tránh mọi phụ thuộc
+# vào tiến trình hay trạng thái còn sót lại, dù bài test này vốn không cần nối mạng thật
+# (kiểm tra chỉ đọc biến cấu hình, chạy trước phần đo cổng của health-check.sh).
+mkdir -p "$T/hci1" "$T/hci2" "$T/hci3"
+printf 'DOMAIN="pbx.test"\nSBC_TLS_DOMAIN="sbc.test"\nCADDY_CERT_BASE="%s/none"\nSTATE_DIR="%s/hci1/state"\nLOG="%s/hci1/log"\nPBX_PORTS="8887"\nSBC_PORTS="127.0.0.3:1"\nSBC_DOCKER_CMD=none\nPBX_SSH="root@10.106.222.50"\nPBX_SSH_KEY="%s/hci1/none-key"\n' "$T" "$T" "$T" "$T" > "$T/hci1/config.conf"
+out=$(PATH="$T/stubs:$PATH" CFG_DIR="$T/hci1" SYSTEMD_RUN_DIR="$T/khong" bash "$ROOT/bin/health-check.sh" 2>&1)
 check "PBX_SSH đặt, PBX_PORTS không có IP: báo LỖI và gợi ý đúng IP từ PBX_SSH" 'echo "$out" | grep -q "^\[LỖI\] .*PBX_SSH đã đặt" && echo "$out" | grep -q "10.106.222.50:<cổng>"'
-printf 'DOMAIN="pbx.test"\nSBC_TLS_DOMAIN="sbc.test"\nCADDY_CERT_BASE="%s/none"\nSTATE_DIR="%s/hc/state"\nLOG="%s/hc/log"\nPBX_PORTS="10.106.222.50:8887"\nSBC_PORTS="127.0.0.2:18999"\nSBC_DOCKER_CMD=none\nPBX_SSH="root@10.106.222.50"\nPBX_SSH_KEY="%s/none-key"\n' "$T" "$T" "$T" "$T" > "$T/hc/config.conf"
-out=$(PATH="$T/stubs:$PATH" CFG_DIR="$T/hc" SYSTEMD_RUN_DIR="$T/khong" bash "$ROOT/bin/health-check.sh" 2>&1)
+
+printf 'DOMAIN="pbx.test"\nSBC_TLS_DOMAIN="sbc.test"\nCADDY_CERT_BASE="%s/none"\nSTATE_DIR="%s/hci2/state"\nLOG="%s/hci2/log"\nPBX_PORTS="10.106.222.50:8887"\nSBC_PORTS="127.0.0.3:1"\nSBC_DOCKER_CMD=none\nPBX_SSH="root@10.106.222.50"\nPBX_SSH_KEY="%s/hci2/none-key"\n' "$T" "$T" "$T" "$T" > "$T/hci2/config.conf"
+out=$(PATH="$T/stubs:$PATH" CFG_DIR="$T/hci2" SYSTEMD_RUN_DIR="$T/khong" bash "$ROOT/bin/health-check.sh" 2>&1)
 check "PBX_SSH đặt, PBX_PORTS đã có IP: không báo lỗi này nữa" '! echo "$out" | grep -q "PBX_SSH đã đặt"'
-check "PBX_SSH để trống (cùng VM): không báo lỗi này dù PBX_PORTS không có IP" '
-  printf "DOMAIN=\"pbx.test\"\nCADDY_CERT_BASE=\"%s/none\"\nSTATE_DIR=\"%s/hc/state\"\nLOG=\"%s/hc/log\"\nPBX_PORTS=\"8887\"\nSBC_PORTS=\"127.0.0.2:18999\"\nSBC_DOCKER_CMD=none\n" "$T" "$T" "$T" > "$T/hc/config.conf"
-  out2=$(PATH="$T/stubs:$PATH" CFG_DIR="$T/hc" SYSTEMD_RUN_DIR="$T/khong" bash "$ROOT/bin/health-check.sh" 2>&1)
-  ! echo "$out2" | grep -q "PBX_SSH đã đặt"'
+
+printf 'DOMAIN="pbx.test"\nCADDY_CERT_BASE="%s/none"\nSTATE_DIR="%s/hci3/state"\nLOG="%s/hci3/log"\nPBX_PORTS="8887"\nSBC_PORTS="127.0.0.3:1"\nSBC_DOCKER_CMD=none\n' "$T" "$T" "$T" > "$T/hci3/config.conf"
+out=$(PATH="$T/stubs:$PATH" CFG_DIR="$T/hci3" SYSTEMD_RUN_DIR="$T/khong" bash "$ROOT/bin/health-check.sh" 2>&1)
+check "PBX_SSH để trống (cùng VM): không báo lỗi này dù PBX_PORTS không có IP" '! echo "$out" | grep -q "PBX_SSH đã đặt"'
 
 echo; echo "KẾT QUẢ: $ok đạt, $bad lỗi"
 [ "$bad" -eq 0 ]

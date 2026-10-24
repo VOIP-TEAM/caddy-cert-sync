@@ -25,7 +25,12 @@ jobs:
             exit 1
           fi
       - name: Tag phải khớp VERSION
-        run: test "v$(cat VERSION)" = "${GITHUB_REF_NAME}"
+        run: |
+          V=$(tr -d '\r' < VERSION | sed '1s/^\xef\xbb\xbf//')
+          if [ "v$V" != "${GITHUB_REF_NAME}" ]; then
+            echo "VERSION chứa \"$V\" (có thể lẫn CRLF hoặc BOM từ Windows), còn tag là \"${GITHUB_REF_NAME}\". Sửa VERSION bằng: printf '%s\\n' \"\${GITHUB_REF_NAME#v}\" > VERSION"
+            exit 1
+          fi
       - name: Tag phải nằm trên nhánh main (đã qua Pull Request và CI)
         run: git merge-base --is-ancestor "${GITHUB_SHA}" origin/main
       - name: Cài công cụ
