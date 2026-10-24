@@ -1,5 +1,9 @@
 # Lịch sử thay đổi
 
+## 1.5.1
+- health-check.sh: thêm kiểm tra khi PBX_SSH đã đặt (PBX ở VM khác) nhưng PBX_PORTS không có IP (chỉ có số cổng) — trường hợp hay gặp khi tự chỉnh hồ sơ same-vm cho khác VM thay vì dùng hồ sơ diff-vm. Báo LỖI kèm gợi ý đúng IP lấy từ PBX_SSH.
+- config/config.conf.example và profiles/same-vm/config.conf: thêm ghi chú TODO ngay cạnh PBX_SSH, nhắc phải sửa PBX_PORTS kèm IP nếu bật PBX_SSH.
+
 ## 1.5.0
 Tách phương án build theo trường hợp triển khai:
 - Cùng VM: gói caddy-cert-sync (đầy đủ). Khác VM: VM SBC cài gói caddy-cert-sync, VM PBX cài gói caddy-cert-sync-agent (chỉ có pbx-agent.sh).

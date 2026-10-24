@@ -103,5 +103,17 @@ check "cổng ở máy khác không kết nối được bị báo lỗi" 'echo 
 check "SBC_DOCKER_CMD=none: bỏ qua kiểm tra tiến trình SBC, không gọi docker exec" 'echo "$out" | grep -q "SBC ở VM khác" && ! echo "$out" | grep -q "SBC: "'
 check "đo SBC bằng SNI của SBC (sbc.test), không phải domain PBX" 'grep -q -- "-connect 127.0.0.2:18999 -servername sbc.test" "$T/ssl.log"'
 
+echo "== I health-check: PBX_SSH đặt nhưng PBX_PORTS thiếu IP (lỗi hay gặp khi tự chỉnh hồ sơ same-vm cho khác VM)"
+printf 'DOMAIN="pbx.test"\nSBC_TLS_DOMAIN="sbc.test"\nCADDY_CERT_BASE="%s/none"\nSTATE_DIR="%s/hc/state"\nLOG="%s/hc/log"\nPBX_PORTS="8887"\nSBC_PORTS="127.0.0.2:18999"\nSBC_DOCKER_CMD=none\nPBX_SSH="root@10.106.222.50"\nPBX_SSH_KEY="%s/none-key"\n' "$T" "$T" "$T" "$T" > "$T/hc/config.conf"
+out=$(PATH="$T/stubs:$PATH" CFG_DIR="$T/hc" SYSTEMD_RUN_DIR="$T/khong" bash "$ROOT/bin/health-check.sh" 2>&1)
+check "PBX_SSH đặt, PBX_PORTS không có IP: báo LỖI và gợi ý đúng IP từ PBX_SSH" 'echo "$out" | grep -q "^\[LỖI\] .*PBX_SSH đã đặt" && echo "$out" | grep -q "10.106.222.50:<cổng>"'
+printf 'DOMAIN="pbx.test"\nSBC_TLS_DOMAIN="sbc.test"\nCADDY_CERT_BASE="%s/none"\nSTATE_DIR="%s/hc/state"\nLOG="%s/hc/log"\nPBX_PORTS="10.106.222.50:8887"\nSBC_PORTS="127.0.0.2:18999"\nSBC_DOCKER_CMD=none\nPBX_SSH="root@10.106.222.50"\nPBX_SSH_KEY="%s/none-key"\n' "$T" "$T" "$T" "$T" > "$T/hc/config.conf"
+out=$(PATH="$T/stubs:$PATH" CFG_DIR="$T/hc" SYSTEMD_RUN_DIR="$T/khong" bash "$ROOT/bin/health-check.sh" 2>&1)
+check "PBX_SSH đặt, PBX_PORTS đã có IP: không báo lỗi này nữa" '! echo "$out" | grep -q "PBX_SSH đã đặt"'
+check "PBX_SSH để trống (cùng VM): không báo lỗi này dù PBX_PORTS không có IP" '
+  printf "DOMAIN=\"pbx.test\"\nCADDY_CERT_BASE=\"%s/none\"\nSTATE_DIR=\"%s/hc/state\"\nLOG=\"%s/hc/log\"\nPBX_PORTS=\"8887\"\nSBC_PORTS=\"127.0.0.2:18999\"\nSBC_DOCKER_CMD=none\n" "$T" "$T" "$T" > "$T/hc/config.conf"
+  out2=$(PATH="$T/stubs:$PATH" CFG_DIR="$T/hc" SYSTEMD_RUN_DIR="$T/khong" bash "$ROOT/bin/health-check.sh" 2>&1)
+  ! echo "$out2" | grep -q "PBX_SSH đã đặt"'
+
 echo; echo "KẾT QUẢ: $ok đạt, $bad lỗi"
 [ "$bad" -eq 0 ]
