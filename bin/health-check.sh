@@ -74,6 +74,13 @@ for f in "$STATE_DIR"/attempts-* "$STATE_DIR"/stuck-alerted-*; do [ -e "$f" ] &&
 sec "Cấu hình"
 if [ -z "${PBX_PORTS:-}" ]; then FAIL "PBX_PORTS rỗng: PBX bị coi là luôn đúng và sẽ không bao giờ được thay; đặt PBX_PORTS (ví dụ 8887)"; else OK "PBX_PORTS=$PBX_PORTS"; fi
 if [ -z "${SBC_PORTS:-}" ]; then FAIL "SBC_PORTS rỗng: SBC bị coi là luôn đúng và sẽ không bao giờ được thay; đặt SBC_PORTS (ví dụ 8883 10443 5065 5067)"; else OK "SBC_PORTS=$SBC_PORTS"; fi
+if [ -n "${PBX_SSH:-}" ] && [ -n "${PBX_PORTS:-}" ]; then
+    bad=0; for p in $PBX_PORTS; do case "$p" in *:*) ;; *) bad=1 ;; esac; done
+    if [ "$bad" = 1 ]; then
+        hint="${PBX_SSH#*@}"
+        FAIL "PBX_SSH đã đặt (PBX ở VM khác) nhưng PBX_PORTS=\"$PBX_PORTS\" không có IP: cổng sẽ bị đo trên chính máy này, không phải trên VM PBX. Sửa thành PBX_PORTS=\"$hint:<cổng>\""
+    fi
+fi
 
 if [ -n "${PBX_SSH:-}" ]; then
     sec "VM PBX qua SSH (${PBX_SSH})"
